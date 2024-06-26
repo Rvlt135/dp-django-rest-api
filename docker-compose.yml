@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        DOMAIN: "your-backend-domain.com"  # Change to your backend domain
+    command: python3 manage.py runserver 0.0.0.0:8080
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@db:5432/mydatabase
